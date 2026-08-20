@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { DiscussionSections, SLRProtocol, SynthesisResult } from "../types/slr";
-import { Sparkles, BookOpen, Download, Copy, Check, AlertCircle, Zap } from "lucide-react";
+import { DiscussionSections, SLRProtocol, SynthesisResult, SLRRecord, StudyCharacteristic } from "../types/slr";
+import { Sparkles, BookOpen, Download, Copy, Check, AlertCircle, Zap, Layers, Quote } from "lucide-react";
 import { callAI, parseJSONLoose } from "../utils/aiClient";
 
 interface DiscussionSectionProps {
@@ -8,6 +8,8 @@ interface DiscussionSectionProps {
   onUpdateDiscussion: (disc: DiscussionSections) => void;
   protocol: SLRProtocol;
   synthesis: SynthesisResult;
+  includedRecords?: SLRRecord[];
+  characteristics?: StudyCharacteristic[];
   aiConfig: any;
 }
 
@@ -16,23 +18,53 @@ export default function DiscussionSection({
   onUpdateDiscussion,
   protocol,
   synthesis,
+  includedRecords = [],
+  characteristics = [],
   aiConfig,
 }: DiscussionSectionProps) {
   const [generating, setGenerating] = useState(false);
   const [copied, setCopied] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  // Dynamic rule-based discussion generator
+  // Dynamic rule-based discussion generator grounded in included study findings and categorized author similarities
   const runHeuristicDiscussion = () => {
-    const topic = protocol.title || "the target systematic review topic";
+    const topic = protocol.title || "the investigated domain";
     const pooledEffect = synthesis.pooledEffectEstimate?.effectSize || 0.88;
     const effectMeasure = synthesis.pooledEffectEstimate?.effectMeasure || "pooled effect estimate";
 
+    // Group characteristics by category
+    const catMap = new Map<string, StudyCharacteristic[]>();
+    characteristics.forEach((c) => {
+      const cat = c.category || "Empirical & Methodological Architectures";
+      if (!catMap.has(cat)) catMap.set(cat, []);
+      catMap.get(cat)!.push(c);
+    });
+
+    const categoryDiscussions: string[] = [];
+    catMap.forEach((studies, catName) => {
+      if (studies.length >= 2) {
+        const a1 = studies[0];
+        const a2 = studies[1];
+        categoryDiscussions.push(
+          `Within the ${catName} paradigm, ${a1.authorYear} and ${a2.authorYear} share substantial methodological similarities, both employing ${a1.interventionOrFocus} and related algorithmic baselines to optimize ${a1.primaryOutcome}. While ${a1.authorYear} established that ${a1.keyFinding}, ${a2.authorYear} complemented this by demonstrating that ${a2.keyFinding}, confirming strong convergent validity across independent benchmarks.`
+        );
+      } else if (studies.length === 1) {
+        const s = studies[0];
+        categoryDiscussions.push(
+          `In the ${catName} domain, ${s.authorYear} established benchmark performance using ${s.interventionOrFocus}, demonstrating that ${s.keyFinding}.`
+        );
+      }
+    });
+
+    const crossAuthorText = categoryDiscussions.length > 0
+      ? categoryDiscussions.join(" ")
+      : "Comparative synthesis across categorized investigations reveals consistent algorithmic synergies and outcome convergence.";
+
     const generated: DiscussionSections = {
-      item23aGeneralInterpretation: `This systematic review and meta-synthesis provides an empirical evaluation of ${topic}. The principal findings demonstrate consistent directionality (${effectMeasure} of ${pooledEffect}), confirming that the synthesized evidence base supports the predefined theoretical and empirical framework across diverse cohorts and study settings. Compared with earlier benchmark literature, contemporary approaches show superior consistency, methodological rigor, and robust outcome differentiation.`,
-      item23bLimitationsOfEvidence: `Several methodological limitations across the included primary studies warrant consideration. First, variances in study design and sampling frameworks across primary records introduce potential heterogeneity. Second, differences in measurement instrumentation, feature extraction methodologies, and outcome definitions across primary study sites were observed. Third, relatively few studies included long-term longitudinal follow-up or multi-center external validation.`,
-      item23cLimitationsOfReviewProcess: `Regarding the review methodology itself, search strings were executed across major scientific databases, but non-indexed grey literature and non-English publications may have been omitted, introducing potential publication and language bias. Nonetheless, adherence to PRISMA 2020, PRISMA-S, and ROSES reporting guidelines alongside rigorous dual-reviewer screening ensured comprehensive and reproducible evidence synthesis.`,
-      item23dImplications: `These findings offer important insights for academic research, professional practice, and evidence-based policy. In practical settings, findings should be translated thoughtfully within appropriate governance frameworks. For future research, standardized reporting of effect sizes, open replication protocols, and multi-center collaborative studies are recommended to advance the field.`,
+      item23aGeneralInterpretation: `This systematic literature review provides a comprehensive synthesis of empirical evidence regarding ${topic}. Principal findings across the included investigations demonstrate consistent outcome directionality with a ${effectMeasure} of ${pooledEffect}. When categorized by architectural paradigms, authors within the same thematic clusters demonstrate striking methodological synergies. ${crossAuthorText} Relative to conventional baseline benchmarks, these modern implementations consistently exhibit superior precision, lower error rates, and greater operational stability across heterogeneous experimental configurations.`,
+      item23bLimitationsOfEvidence: `Several methodological considerations across the included primary studies warrant critical appraisal. First, although authors within shared categories demonstrate consensus improvements, variations in benchmark scale, dataset distributions (${characteristics.map((c) => c.sampleSize).filter(Boolean).slice(0, 3).join(", ") || "evaluation corpora"}), and baseline configurations introduce between-study variance. Second, discrepancies in measurement instrumentation, experimental hyperparameters, and reporting metrics across primary research groups present challenges for direct cross-benchmark harmonization. Third, only a subset of primary investigations conducted multi-center prospective validation or long-term stress testing under realistic deployment conditions.`,
+      item23cLimitationsOfReviewProcess: `Regarding the systematic review methodology, comprehensive multi-database search strategies were executed across major bibliographic indices, yet non-indexed grey literature and non-English publications were excluded, representing potential publication and language selection factors. In accordance with systematic review rigor, secondary literature, literature surveys, and non-empirical review articles were explicitly excluded to preserve the integrity of primary evidence. Dual-reviewer screening, structured consensus moderation, and domain-appropriate quality appraisals ensured a reproducible and transparent evidence base.`,
+      item23dImplications: `The synthesized findings provide actionable implications for software practitioners, research engineers, and decision-makers. In operational environments, adoption of validated architectural frameworks should be coupled with automated regression monitoring and standardized benchmark calibration. For authors within shared research categories, future investigations should prioritize standardized reporting of effect sizes, shared public benchmark datasets, and collaborative cross-validation studies to accelerate reproducible scientific advancement.`,
     };
 
     onUpdateDiscussion(generated);
@@ -42,20 +74,52 @@ export default function DiscussionSection({
   const handleGenerateDiscussion = async () => {
     setGenerating(true);
     setErrorMessage(null);
-    const prompt = `Following the 4 distinct PRISMA 2020 Discussion items (Items 23a–23d), draft an academic discussion section for:
-Title: "${protocol.title}"
-Review Type: "${protocol.reviewType}"
-PICO Population / Context: "${protocol.objectivesPICO.population}"
-PICO Intervention / Exposure: "${protocol.objectivesPICO.intervention}"
-PICO Comparator: "${protocol.objectivesPICO.comparator}"
-PICO Outcomes: "${protocol.objectivesPICO.outcomes}"
-Synthesis Findings Summary: ${JSON.stringify(synthesis.subtopics.map((s) => s.title))}
 
-Structure your response strictly into 4 distinct parts tailored specifically to the given topic (do NOT include unrelated clinical terms unless the topic is medical):
-1. item23aGeneralInterpretation: Provide a general interpretation of the results in the context of other evidence and existing scientific paradigms (PRISMA Item 23a).
-2. item23bLimitationsOfEvidence: Discuss limitations of the included primary evidence (e.g. risk of bias, heterogeneity, observational constraints, generalizability) (PRISMA Item 23b).
-3. item23cLimitationsOfReviewProcess: Discuss limitations of the review processes used (e.g. database selections, grey literature exclusions, search parameters) (PRISMA Item 23c).
-4. item23dImplications: Discuss actionable implications of the results for practical implementation, policy frameworks, and future research agendas (PRISMA Item 23d).
+    const studiesData = characteristics.length > 0
+      ? characteristics.map((c) => ({
+          citation: c.authorYear,
+          category: c.category,
+          country: c.country,
+          sampleSize: c.sampleSize,
+          population: c.population,
+          intervention: c.interventionOrFocus,
+          comparator: c.comparator,
+          primaryOutcome: c.primaryOutcome,
+          keyFinding: c.keyFinding,
+          studyDesign: c.studyDesign,
+        }))
+      : includedRecords.map((r) => ({
+          citation: `${r.authors[0]?.split(",")[0] || "Author"} et al. (${r.year || "2024"})`,
+          title: r.title,
+          abstract: (r.abstract || "").slice(0, 250),
+        }));
+
+    const prompt = `Act as an expert academic journal editor. Draft a rigorous 4-part academic Discussion section directly synthesizing and contextualizing the findings of the included studies grouped by their technological categories and characteristics.
+Special Focus: Within each category, identify authors who share similarities in their methodology, proposed architecture, or findings, and explicitly discuss their commonalities, shared traits, consensus findings, and complementary differences.
+
+Review Title: "${protocol.title}"
+Review Type: "${protocol.reviewType}"
+Framework: "${protocol.formulationFramework || "PICOC"}"
+Included Studies and Characteristics:
+${JSON.stringify(studiesData)}
+
+Synthesis Subtopics:
+${JSON.stringify(synthesis.subtopics.map((s) => ({ title: s.title, summary: s.prose.slice(0, 200) })))}
+
+Pooled Effect Estimate: ${synthesis.pooledEffectEstimate ? `${synthesis.pooledEffectEstimate.effectMeasure} = ${synthesis.pooledEffectEstimate.effectSize}` : "Consistent positive effect"}
+
+STRICT WRITING RULES:
+1. WRITE IN CONTINUOUS COHESIVE PARAGRAPHS AND STATEMENTS ONLY. DO NOT USE ANY BULLET POINTS, LISTS, OR DASHES (-).
+2. Write in strictly third-person objective academic voice. NEVER use first-person pronouns (DO NOT use "we", "our", "us", "in our review", "we found").
+3. DO NOT use dashes or hyphens as punctuation dividers. Use standard sentence structure with commas, semicolons, and parentheses.
+4. DO NOT mention "PRISMA Item", "PRISMA", "Item 23a", etc. Use natural academic discourse.
+5. CITE AND DISCUSS THE ACTUAL INCLUDED STUDIES by author and year (e.g. Chen et al., 2023). Within each category, discuss authors who share similarities and contrast their results.
+
+Structure the response into 4 distinct sections:
+1. item23aGeneralInterpretation: Deep interpretation of findings directly citing included studies, grouping by category, discussing similarities among authors in the same category, and contextualizing within existing literature.
+2. item23bLimitationsOfEvidence: Critical evaluation of limitations within the primary studies (e.g., experimental setups, sample/data adequacy, measurement limitations, lack of external validation).
+3. item23cLimitationsOfReviewProcess: Objective appraisal of systematic review process limitations (e.g., database coverage, exclusion of secondary review papers to prioritize primary evidence, language boundaries).
+4. item23dImplications: Concrete, actionable implications for practitioners, software engineers, and future research agendas.
 
 Return ONLY a JSON object:
 {
@@ -88,7 +152,7 @@ Return ONLY a JSON object:
   };
 
   const copyFullDiscussion = () => {
-    const text = `## Discussion\n\n### 23a. General Interpretation of Results in Context\n${discussion.item23aGeneralInterpretation}\n\n### 23b. Limitations of Included Evidence\n${discussion.item23bLimitationsOfEvidence}\n\n### 23c. Limitations of Review Process\n${discussion.item23cLimitationsOfReviewProcess}\n\n### 23d. Implications for Practice, Policy, and Research\n${discussion.item23dImplications}`;
+    const text = `## Discussion\n\n### 1. Principal Findings and Contextual Interpretation\n${discussion.item23aGeneralInterpretation}\n\n### 2. Methodological Strengths and Limitations of Included Evidence\n${discussion.item23bLimitationsOfEvidence}\n\n### 3. Limitations of Systematic Review Methodology\n${discussion.item23cLimitationsOfReviewProcess}\n\n### 4. Practical Implications and Future Research Directions\n${discussion.item23dImplications}`;
     navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -121,13 +185,13 @@ Return ONLY a JSON object:
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <div className="font-mono text-[10px] text-indigo-600 uppercase tracking-wider font-bold">
-              PRISMA 2020 Items 23a, 23b, 23c & 23d
+              Evidence Synthesis & Critical Evaluation
             </div>
             <h2 className="text-2xl font-bold text-slate-900 mt-0.5">
-              Structured 4-Part Discussion Section
+              Structured Academic Discussion
             </h2>
             <p className="text-xs text-slate-500 mt-1">
-              Complete academic discussion divided into general interpretation (23a), evidence limitations (23b), review process limitations (23c), and practice/policy implications (23d).
+              Comprehensive discussion interpreting findings from included records, evaluating evidence limitations, addressing review methodology constraints, and formulating practical implications.
             </p>
           </div>
 
@@ -138,36 +202,56 @@ Return ONLY a JSON object:
               className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-mono font-semibold text-white bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-300 rounded-lg shadow-xs transition-colors cursor-pointer"
             >
               <Sparkles className="w-3.5 h-3.5 text-indigo-200" />
-              {generating ? "Drafting Discussion..." : "AI Generate PRISMA Discussion"}
+              {generating ? "Drafting Discussion..." : "AI Generate Discussion (from Records)"}
             </button>
             <button
               onClick={runHeuristicDiscussion}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono font-medium text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 rounded-lg shadow-2xs cursor-pointer"
+              className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-mono font-medium text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 rounded-lg shadow-2xs cursor-pointer"
             >
               <Zap className="w-3.5 h-3.5 text-indigo-600" />
-              Instant Heuristic Draft
+              Instant Structured Draft
             </button>
             <button
               onClick={copyFullDiscussion}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono font-medium text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 rounded-lg shadow-2xs cursor-pointer"
+              className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-mono font-medium text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 rounded-lg shadow-2xs cursor-pointer"
             >
               {copied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
               {copied ? "Copied!" : "Copy Discussion"}
             </button>
           </div>
         </div>
+
+        {/* Included Study Evidence Preview */}
+        {characteristics.length > 0 && (
+          <div className="pt-3 border-t border-slate-100 flex items-center gap-2 text-xs text-slate-600 flex-wrap">
+            <span className="font-semibold text-slate-800 flex items-center gap-1">
+              <Quote className="w-3.5 h-3.5 text-indigo-600" />
+              Synthesized Records ({characteristics.length} studies):
+            </span>
+            {characteristics.slice(0, 4).map((c, i) => (
+              <span key={i} className="px-2 py-0.5 bg-slate-100 border border-slate-200 rounded-md text-[11px] font-mono text-slate-800">
+                {c.authorYear}
+              </span>
+            ))}
+            {characteristics.length > 4 && (
+              <span className="text-[11px] text-slate-500 font-mono">
+                +{characteristics.length - 4} more
+              </span>
+            )}
+          </div>
+        )}
       </div>
 
-      {/* 4 PRISMA Discussion Panels */}
+      {/* 4 Editable Sections */}
       <div className="space-y-4">
-        {/* 23a */}
+        {/* 1. General Interpretation */}
         <div className="bg-white border border-slate-200 p-6 rounded-xl shadow-xs space-y-3">
           <div className="flex items-center justify-between">
             <div className="font-mono text-xs font-bold text-slate-900 flex items-center gap-2">
               <span className="px-2 py-0.5 rounded bg-indigo-50 border border-indigo-200 text-indigo-700">
-                PRISMA Item 23a
+                1
               </span>
-              <span>General Interpretation of Results in Context</span>
+              <span>Principal Findings and Contextual Interpretation</span>
             </div>
           </div>
           <textarea
@@ -179,14 +263,14 @@ Return ONLY a JSON object:
           />
         </div>
 
-        {/* 23b */}
+        {/* 2. Limitations of Evidence */}
         <div className="bg-white border border-slate-200 p-6 rounded-xl shadow-xs space-y-3">
           <div className="flex items-center justify-between">
             <div className="font-mono text-xs font-bold text-slate-900 flex items-center gap-2">
               <span className="px-2 py-0.5 rounded bg-amber-50 border border-amber-200 text-amber-800">
-                PRISMA Item 23b
+                2
               </span>
-              <span>Limitations of Included Evidence</span>
+              <span>Methodological Strengths and Limitations of Included Evidence</span>
             </div>
           </div>
           <textarea
@@ -198,14 +282,14 @@ Return ONLY a JSON object:
           />
         </div>
 
-        {/* 23c */}
+        {/* 3. Limitations of Review Process */}
         <div className="bg-white border border-slate-200 p-6 rounded-xl shadow-xs space-y-3">
           <div className="flex items-center justify-between">
             <div className="font-mono text-xs font-bold text-slate-900 flex items-center gap-2">
               <span className="px-2 py-0.5 rounded bg-slate-100 border border-slate-300 text-slate-800">
-                PRISMA Item 23c
+                3
               </span>
-              <span>Limitations of the Review Process</span>
+              <span>Limitations of Systematic Review Methodology</span>
             </div>
           </div>
           <textarea
@@ -217,14 +301,14 @@ Return ONLY a JSON object:
           />
         </div>
 
-        {/* 23d */}
+        {/* 4. Implications */}
         <div className="bg-white border border-slate-200 p-6 rounded-xl shadow-xs space-y-3">
           <div className="flex items-center justify-between">
             <div className="font-mono text-xs font-bold text-slate-900 flex items-center gap-2">
               <span className="px-2 py-0.5 rounded bg-emerald-50 border border-emerald-200 text-emerald-800">
-                PRISMA Item 23d
+                4
               </span>
-              <span>Implications for Practice, Policy, and Research</span>
+              <span>Practical Implications and Future Research Directions</span>
             </div>
           </div>
           <textarea

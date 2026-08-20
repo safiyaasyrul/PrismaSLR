@@ -237,33 +237,52 @@ export default function App() {
     return acc;
   }, [excludedRecords, screening]);
 
+  const isSample = useMemo(() => {
+    return records.some(
+      (r) =>
+        r.id.startsWith("chen-2023") ||
+        r.id.startsWith("rodriguez-2024") ||
+        r.id.startsWith("zhao-2023")
+    );
+  }, [records]);
+
   // PRISMA Flow Diagram Dynamic Counts
   const prismaCounts = useMemo(() => {
-    const totalIdentified = records.length + (dupesRemoved || 0) + 240;
-    const dbCount = totalIdentified - 48;
-    const otherCount = 48;
+    if (isSample) {
+      return {
+        identifiedDb: 1248,
+        identifiedOther: 48,
+        duplicatesRemoved: dupesRemoved || 284,
+        screened: 1012,
+        screenedExcluded: 964,
+        soughtRetrieval: 48,
+        notRetrieved: 0,
+        assessed: 48,
+        assessedExcluded: 38,
+        exclusionReasonsBreakdown,
+        included: includedRecords.length > 0 ? includedRecords.length : 10,
+      };
+    }
+
+    const totalIdentified = records.length + (dupesRemoved || 0);
     const screenedCount = records.length;
-    const screenedExcludedCount = excludedRecords.length > 2 ? excludedRecords.length - 2 : excludedRecords.length;
-    const soughtCount = includedRecords.length + 2;
-    const notRetrievedCount = 0;
-    const assessedCount = soughtCount;
-    const assessedExcludedCount = 2;
+    const screenedExcludedCount = excludedRecords.length;
     const includedCount = includedRecords.length;
 
     return {
-      identifiedDb: dbCount > 0 ? dbCount : 1248,
-      identifiedOther: otherCount,
-      duplicatesRemoved: dupesRemoved || 284,
-      screened: screenedCount > 0 ? screenedCount : 1012,
-      screenedExcluded: screenedExcludedCount > 0 ? screenedExcludedCount : 964,
-      soughtRetrieval: soughtCount > 0 ? soughtCount : 48,
-      notRetrieved: notRetrievedCount,
-      assessed: assessedCount > 0 ? assessedCount : 48,
-      assessedExcluded: assessedExcludedCount,
+      identifiedDb: totalIdentified > 0 ? totalIdentified : 0,
+      identifiedOther: 0,
+      duplicatesRemoved: dupesRemoved || 0,
+      screened: screenedCount,
+      screenedExcluded: screenedExcludedCount,
+      soughtRetrieval: includedCount,
+      notRetrieved: 0,
+      assessed: includedCount,
+      assessedExcluded: 0,
       exclusionReasonsBreakdown,
-      included: includedCount > 0 ? includedCount : 10,
+      included: includedCount,
     };
-  }, [records, dupesRemoved, includedRecords, excludedRecords, exclusionReasonsBreakdown]);
+  }, [isSample, records, dupesRemoved, includedRecords, excludedRecords, exclusionReasonsBreakdown]);
 
   // Checklist item update helpers
   const handleUpdateChecklistItem = (itemNumber: string, updates: Partial<PrismaChecklistItem>) => {
@@ -906,6 +925,8 @@ export default function App() {
               protocol={protocol}
               synthesis={synthesis}
               aiConfig={activeAIConfig}
+              includedRecords={includedRecords}
+              characteristics={characteristics}
             />
           )}
 

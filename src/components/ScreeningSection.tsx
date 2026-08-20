@@ -158,7 +158,7 @@ Exclusion Criteria: ${protocol.eligibilityCriteria.exclusion.join("; ")}
 
 Review the following studies. Note that records with ≥50% keyword match in title should strongly favor inclusion.
 Calculate an overall eligibility score (0-100) and concise justification:
-If score < 80, choose exclusion reason: "Wrong population" | "Wrong intervention / exposure" | "Wrong comparator" | "Wrong outcome" | "Wrong study design" | "Not accessible / full text unavailable" | "Other".
+If score < 80, choose exclusion reason: "Secondary literature / Review paper" | "Out of scope / Keyword mismatch" | "Wrong population" | "Wrong intervention / exposure" | "Wrong comparator" | "Wrong outcome" | "Wrong study design" | "Not accessible / full text unavailable" | "Duplicate / non-original" | "Language barrier" | "Other".
 
 Studies:
 ${JSON.stringify(payload)}
@@ -587,6 +587,8 @@ Return ONLY a JSON array:
                           onChange={(e) => handleSetDecision(r.id, false, e.target.value as any)}
                           className="text-xs font-mono p-1 border border-rose-300 rounded bg-white text-rose-800 font-semibold"
                         >
+                          <option value="Secondary literature / Review paper">Secondary literature / Review paper</option>
+                          <option value="Out of scope / Keyword mismatch">Out of scope / Keyword mismatch</option>
                           <option value="Wrong population">Wrong population</option>
                           <option value="Wrong intervention / exposure">Wrong intervention / exposure</option>
                           <option value="Wrong comparator">Wrong comparator</option>

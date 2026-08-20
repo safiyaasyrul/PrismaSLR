@@ -6,7 +6,8 @@ export interface SLRRecord {
   abstract: string;
   source: string;
   doi?: string;
-  databaseSource?: "Scopus" | "Web of Science" | "PubMed" | "Google Scholar" | "IEEE Xplore" | "Cochrane" | "Other";
+  databaseSource?: "Scopus" | "Web of Science" | "PubMed" | "Google Scholar" | "IEEE Xplore" | "Cochrane" | "Other" | string;
+  databaseSources?: string[];
   studyType?: string;
 }
 
@@ -16,6 +17,8 @@ export interface ScreeningDecision {
   decision: "include" | "exclude";
   agreed?: boolean; // human confirmation
   exclusionReason?:
+    | "Secondary literature / Review paper"
+    | "Out of scope / Keyword mismatch"
     | "Wrong population"
     | "Wrong intervention / exposure"
     | "Wrong comparator"
@@ -31,25 +34,46 @@ export interface ScreeningDecision {
 export interface StudyCharacteristic {
   recordId: string;
   authorYear: string;
-  country: string;
-  sampleSize: string;
-  population: string;
+  category?: string; // e.g. Architecture, Domain, Algorithm Type
+  country?: string;
+  sampleSize?: string;
+  population?: string;
   interventionOrFocus: string;
-  comparator: string;
+  comparator?: string;
   primaryOutcome: string;
-  studyDesign: string;
+  studyDesign?: string;
   keyFinding: string;
+}
+
+export type QualityAssessmentFrameworkType =
+  | "engineering_rigor"
+  | "threats_to_validity"
+  | "clinical_rob2"
+  | "custom_checklist";
+
+export interface EngineeringQualityItem {
+  recordId: string;
+  authorYear: string;
+  q1DesignSetup: "Met" | "Partially Met" | "Not Met" | "Low" | "Some concerns" | "High";
+  q2DataAdequacy: "Met" | "Partially Met" | "Not Met" | "Low" | "Some concerns" | "High";
+  q3MeasurementMethodology: "Met" | "Partially Met" | "Not Met" | "Low" | "Some concerns" | "High";
+  q4BaselineValidation: "Met" | "Partially Met" | "Not Met" | "Low" | "Some concerns" | "High";
+  q5RepeatabilityReproducibility: "Met" | "Partially Met" | "Not Met" | "Low" | "Some concerns" | "High";
+  q6ModelAssumptionsValidity: "Met" | "Partially Met" | "Not Met" | "Low" | "Some concerns" | "High";
+  q7ReportingCompleteness: "Met" | "Partially Met" | "Not Met" | "Low" | "Some concerns" | "High";
+  overallQuality: "High Rigor" | "Moderate Rigor" | "Low Rigor" | "Low" | "Some concerns" | "High";
+  justification: string;
 }
 
 export interface RiskOfBiasItem {
   recordId: string;
   authorYear: string;
-  d1Selection: "Low" | "Some concerns" | "High";
-  d2Performance: "Low" | "Some concerns" | "High";
-  d3Attrition: "Low" | "Some concerns" | "High";
-  d4Detection: "Low" | "Some concerns" | "High";
-  d5Reporting: "Low" | "Some concerns" | "High";
-  overall: "Low" | "Some concerns" | "High";
+  d1Selection: "Low" | "Some concerns" | "High" | "Met" | "Partially Met" | "Not Met";
+  d2Performance: "Low" | "Some concerns" | "High" | "Met" | "Partially Met" | "Not Met";
+  d3Attrition: "Low" | "Some concerns" | "High" | "Met" | "Partially Met" | "Not Met";
+  d4Detection: "Low" | "Some concerns" | "High" | "Met" | "Partially Met" | "Not Met";
+  d5Reporting: "Low" | "Some concerns" | "High" | "Met" | "Partially Met" | "Not Met";
+  overall: "Low" | "Some concerns" | "High" | "High Rigor" | "Moderate Rigor" | "Low Rigor";
   justification: string;
 }
 
@@ -161,23 +185,56 @@ export interface RosesChecklistItem {
   userNotes: string;
 }
 
+export type FormulationFrameworkType = "PICO" | "PICOC" | "PEO" | "SPIDER";
+
+export interface ObjectivesPICO {
+  population: string;
+  intervention: string;
+  comparator: string;
+  outcomes: string;
+  studyDesigns: string;
+}
+
+export interface ObjectivesPICOC {
+  population: string;
+  intervention: string;
+  comparison: string;
+  outcomes: string;
+  context: string;
+  studyDesigns?: string;
+}
+
+export interface ObjectivesPEO {
+  population: string;
+  exposure: string;
+  outcomes: string;
+  setting?: string;
+  studyDesigns?: string;
+}
+
+export interface ObjectivesSPIDER {
+  sample: string;
+  phenomenonOfInterest: string;
+  design: string;
+  evaluation: string;
+  researchType: string;
+}
+
 export interface SLRProtocol {
   // Items 1, 3 & 4 (Title, Rationale & Objectives)
   title: string;
   reviewType: string;
+  formulationFramework?: FormulationFrameworkType;
   introductionRationale?: string;
   backgroundContext?: string;
   knowledgeGap?: string;
   primaryResearchQuestions?: string[];
   secondaryObjectives?: string[];
   protocolRegistration?: string;
-  objectivesPICO: {
-    population: string;
-    intervention: string;
-    comparator: string;
-    outcomes: string;
-    studyDesigns: string;
-  };
+  objectivesPICO: ObjectivesPICO;
+  objectivesPICOC?: ObjectivesPICOC;
+  objectivesPEO?: ObjectivesPEO;
+  objectivesSPIDER?: ObjectivesSPIDER;
   // Item 5 Eligibility
   eligibilityCriteria: {
     inclusion: string[];

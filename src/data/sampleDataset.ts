@@ -16,12 +16,35 @@ export const BLANK_PROTOCOL: SLRProtocol = {
     "Assess certainty of cumulative evidence using the GRADE framework",
   ],
   protocolRegistration: "PROSPERO (e.g., CRD42026XXXXXX) / OSF Registries (osf.io/xxxxx)",
+  formulationFramework: "PICO",
   objectivesPICO: {
     population: "Define target population or condition (e.g., adults with specific condition)...",
     intervention: "Define intervention, diagnostic method, or exposure of interest...",
     comparator: "Define comparator, control group, or standard of care...",
     outcomes: "Primary and secondary outcomes of interest...",
     studyDesigns: "Eligible study designs (e.g., RCTs, cohort studies, observational trials)...",
+  },
+  objectivesPICOC: {
+    population: "Target software systems, embedded platforms, or application domains...",
+    intervention: "Engineering technique, algorithm, architectural framework, or tool...",
+    comparison: "Baseline standard, legacy heuristic, or state-of-the-art benchmark...",
+    outcomes: "Performance metrics (latency, throughput, accuracy, memory, scalability)...",
+    context: "Deployment setting (cloud, edge IoT, real-time embedded, distributed)...",
+    studyDesigns: "Empirical software benchmarks, controlled experiments, case studies...",
+  },
+  objectivesPEO: {
+    population: "Target ecosystem, catchment, biota, or observational cohort...",
+    exposure: "Environmental factor, pollutant, climate stressor, or risk agent...",
+    outcomes: "Ecological degradation, disease incidence, or biomarker changes...",
+    setting: "Geographic region, climate zone, or ecosystem setting...",
+    studyDesigns: "Longitudinal observational cohorts, biomonitoring surveys, field registries...",
+  },
+  objectivesSPIDER: {
+    sample: "Target informants, stakeholder groups, or study participants...",
+    phenomenonOfInterest: "Lived experiences, perceptions, behaviors, or decision-making processes...",
+    design: "Qualitative methodology (in-depth interviews, focus groups, ethnography)...",
+    evaluation: "Subjective themes (attitudes, emotional impacts, barriers, facilitators)...",
+    researchType: "Qualitative (phenomenology, grounded theory) or Mixed-Methods...",
   },
   eligibilityCriteria: {
     inclusion: [
@@ -95,12 +118,35 @@ export const SAMPLE_PROTOCOL: SLRProtocol = {
     "Formulate evidence-based clinical implementation guidelines based on GRADE certainty ratings",
   ],
   protocolRegistration: "PROSPERO 2026 Registration ID: CRD42026884129 (Available via osf.io/preprints/t2dm-ml-slr)",
+  formulationFramework: "PICO",
   objectivesPICO: {
     population: "Adult populations (aged >= 18 years) at risk of developing Type 2 Diabetes Mellitus (T2DM) without baseline diagnosis.",
     intervention: "Supervised machine learning algorithms (e.g., XGBoost, Random Forest, Support Vector Machines, Neural Networks, Logistic Regression) utilizing electronic health records, genomic markers, or metabolic biomarkers.",
     comparator: "Standard clinical risk scores (e.g., FINDRISC, ADA Risk Score, Framingham Diabetes Risk Score) or standard clinical practice.",
     outcomes: "Primary: Predictive discrimination (AUC-ROC, C-statistic), sensitivity, specificity, and Odds Ratio / Hazard Ratio for early incidence. Secondary: Model calibration (Brier score), feature importance rankings.",
     studyDesigns: "Prospective cohort studies, retrospective observational cohorts, and validated clinical registry trials.",
+  },
+  objectivesPICOC: {
+    population: "Healthcare electronic health record (EHR) databases, longitudinal clinical registries, and ambulatory monitoring systems.",
+    intervention: "Machine learning prediction pipelines (XGBoost, Random Forest, Multi-Layer Perceptrons, LightGBM).",
+    comparison: "Baseline statistical logistic regression models and classical scoring rules (FINDRISC, ADA scoring index).",
+    outcomes: "Model discrimination (AUC-ROC, C-statistic), F1-score, Brier calibration score, and inference latency.",
+    context: "Primary care clinical decision support systems and ambulatory outpatient triage workflows.",
+    studyDesigns: "Empirical machine learning benchmarks and multi-center retrospective validation studies.",
+  },
+  objectivesPEO: {
+    population: "Adult non-diabetic human populations undergoing routine metabolic and laboratory screening.",
+    exposure: "Combined metabolic risk exposures (elevated fasting glucose, HbA1c, dyslipidemia, insulin resistance biomarkers).",
+    outcomes: "Incident Type 2 Diabetes onset within 3 to 10-year follow-up windows and microvascular complication risks.",
+    setting: "Community cohorts and population-level longitudinal biobanks across diverse ethnic populations.",
+    studyDesigns: "Longitudinal prospective cohort studies and population-based epidemiology registries.",
+  },
+  objectivesSPIDER: {
+    sample: "Primary care physicians, endocrinologists, and prediabetic adult patients utilizing predictive clinical tools.",
+    phenomenonOfInterest: "Clinical perceptions, trust, adoption barriers, and user experience when implementing AI risk prediction scores.",
+    design: "Semi-structured qualitative interviews, clinician focus groups, and usability surveys.",
+    evaluation: "Perceived diagnostic utility, workflow integration friction, explanatory clarity, and shared decision-making impact.",
+    researchType: "Qualitative and mixed-methods implementation studies.",
   },
   eligibilityCriteria: {
     inclusion: [
