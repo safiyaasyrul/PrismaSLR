@@ -1,21 +1,155 @@
+export type SupportedAIProvider =
+  | "server-gemini"
+  | "openai"
+  | "claude"
+  | "gemini"
+  | "emergent"
+  | "replit"
+  | "other";
+
 export interface AIProviderConfig {
-  provider: "server-gemini" | "claude" | "openai" | "gemini" | "emergent" | "replit" | "other";
+  provider: SupportedAIProvider;
   apiKey?: string;
   customBase?: string;
   model?: string;
+}
+
+export interface UserAIKeysConfig {
+  activeProvider: SupportedAIProvider;
+  openai: {
+    apiKey: string;
+    model: string;
+    customBase?: string;
+  };
+  claude: {
+    apiKey: string;
+    model: string;
+  };
+  gemini: {
+    apiKey: string;
+    model: string;
+  };
+  emergent: {
+    apiKey: string;
+    model: string;
+    customBase: string;
+  };
+  replit: {
+    apiKey: string;
+    model: string;
+    customBase: string;
+  };
+  other: {
+    apiKey: string;
+    model: string;
+    customBase: string;
+  };
+}
+
+export const DEFAULT_AI_KEYS_CONFIG: UserAIKeysConfig = {
+  activeProvider: "server-gemini",
+  openai: {
+    apiKey: "",
+    model: "gpt-4o-mini",
+    customBase: "https://api.openai.com/v1",
+  },
+  claude: {
+    apiKey: "",
+    model: "claude-3-7-sonnet-20250219",
+  },
+  gemini: {
+    apiKey: "",
+    model: "gemini-3.7-flash",
+  },
+  emergent: {
+    apiKey: "",
+    model: "gpt-4o-mini",
+    customBase: "https://api.emergent.sh/v1",
+  },
+  replit: {
+    apiKey: "",
+    model: "replit-code-v1_5-3b",
+    customBase: "https://api.replit.com/ai/v1",
+  },
+  other: {
+    apiKey: "",
+    model: "gpt-4o-mini",
+    customBase: "https://openrouter.ai/api/v1",
+  },
+};
+
+export function getActiveAIConfig(keys?: Partial<UserAIKeysConfig> | null): AIProviderConfig {
+  if (!keys) return { provider: "server-gemini", model: "gemini-3.7-flash" };
+
+  const active = keys.activeProvider || "server-gemini";
+
+  switch (active) {
+    case "openai":
+      return {
+        provider: "openai",
+        apiKey: keys.openai?.apiKey?.trim() || "",
+        model: keys.openai?.model || "gpt-4o-mini",
+        customBase: keys.openai?.customBase?.trim() || "https://api.openai.com/v1",
+      };
+    case "claude":
+      return {
+        provider: "claude",
+        apiKey: keys.claude?.apiKey?.trim() || "",
+        model: keys.claude?.model || "claude-3-7-sonnet-20250219",
+      };
+    case "gemini":
+      return {
+        provider: "gemini",
+        apiKey: keys.gemini?.apiKey?.trim() || "",
+        model: keys.gemini?.model || "gemini-3.7-flash",
+      };
+    case "emergent":
+      return {
+        provider: "emergent",
+        apiKey: keys.emergent?.apiKey?.trim() || "",
+        model: keys.emergent?.model || "gpt-4o-mini",
+        customBase: keys.emergent?.customBase?.trim() || "https://api.emergent.sh/v1",
+      };
+    case "replit":
+      return {
+        provider: "replit",
+        apiKey: keys.replit?.apiKey?.trim() || "",
+        model: keys.replit?.model || "replit-code-v1_5-3b",
+        customBase: keys.replit?.customBase?.trim() || "https://api.replit.com/ai/v1",
+      };
+    case "other":
+      return {
+        provider: "other",
+        apiKey: keys.other?.apiKey?.trim() || "",
+        model: keys.other?.model || "gpt-4o-mini",
+        customBase: keys.other?.customBase?.trim() || "https://openrouter.ai/api/v1",
+      };
+    case "server-gemini":
+    default:
+      return {
+        provider: "server-gemini",
+        model: "gemini-3.7-flash",
+      };
+  }
 }
 
 export async function callAI(
   prompt: string,
   systemInstruction?: string,
   config?: AIProviderConfig,
-  maxTokens: number = 3000
+  maxTokens: number = 3500
 ): Promise<string> {
   const provider = config?.provider || "server-gemini";
-  const apiKey = config?.apiKey || "";
-  const customBase = config?.customBase || "";
+  const apiKey = config?.apiKey?.trim() || "";
+  const customBase = config?.customBase?.trim() || "";
+  let model = config?.model || "";
 
-  // 1. Server-side Gemini endpoint (built-in default, requires no client key)
+  // Normalize model name if it references old Gemini models
+  if (model.includes("gemini-2.5") || model.includes("gemini-2.0") || model.includes("gemini-1.5")) {
+    model = "gemini-3.7-flash";
+  }
+
+  // 1. Server-side Gemini endpoint (built-in default)
   if (provider === "server-gemini" || (!apiKey && provider === "gemini")) {
     const res = await fetch("/api/gemini/generate", {
       method: "POST",
@@ -23,7 +157,7 @@ export async function callAI(
       body: JSON.stringify({
         prompt,
         systemInstruction,
-        model: "gemini-3.7-flash",
+        model: model || "gemini-3.7-flash",
         maxOutputTokens: maxTokens,
         temperature: 0.3,
       }),
@@ -37,7 +171,12 @@ export async function callAI(
 
   // 2. Direct Anthropic Claude
   if (provider === "claude") {
-    if (!apiKey) throw new Error("Claude API key is required.");
+    if (!apiKey) {
+      throw new Error(
+        "Anthropic Claude API key is required. Please add your key (sk-ant-...) in the AI Providers & API Keys tab."
+      );
+    }
+    const chosenModel = model || "claude-3-7-sonnet-20250219";
     const res = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: {
@@ -47,7 +186,7 @@ export async function callAI(
         "anthropic-dangerous-direct-browser-access": "true",
       },
       body: JSON.stringify({
-        model: config?.model || "claude-sonnet-4-6",
+        model: chosenModel,
         max_tokens: maxTokens,
         system: systemInstruction || "",
         messages: [{ role: "user", content: prompt }],
@@ -60,9 +199,10 @@ export async function callAI(
 
   // 3. Direct Gemini (Client key)
   if (provider === "gemini" && apiKey) {
+    const chosenModel = model || "gemini-3.7-flash";
     const sysText = systemInstruction ? systemInstruction + "\n\n" : "";
     const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/${chosenModel}:generateContent?key=${apiKey}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -73,38 +213,95 @@ export async function callAI(
       }
     );
     const data = await res.json();
-    if (data.error) throw new Error(data.error.message || "Gemini API error");
+    if (data.error) throw new Error(data.error.message || `Gemini API error: ${JSON.stringify(data.error)}`);
     return data.candidates?.[0]?.content?.parts?.[0]?.text || "";
   }
 
-  // 4. OpenAI-compatible providers
-  const BASE_URLS: Record<string, string> = {
-    openai: "https://api.openai.com/v1",
-    emergent: "https://api.emergent.sh/v1",
-    replit: "https://inference.replit.com/v1",
-    other: customBase || "https://api.openai.com/v1",
-  };
-  const MODELS: Record<string, string> = {
-    openai: "gpt-4o-mini",
-    emergent: "claude-sonnet-4-5",
-    replit: "replit-code-v1-3b",
-    other: config?.model || "gpt-4o-mini",
-  };
+  // 4. OpenAI, Emergent, Replit, or other OpenAI-compatible endpoints
+  if (
+    provider === "openai" ||
+    provider === "emergent" ||
+    provider === "replit" ||
+    provider === "other"
+  ) {
+    if (!apiKey) {
+      const name =
+        provider === "openai"
+          ? "OpenAI"
+          : provider === "emergent"
+          ? "Emergent"
+          : provider === "replit"
+          ? "Replit"
+          : "Custom AI";
+      throw new Error(`${name} API key is required. Please provide your key in the AI Providers & API Keys tab.`);
+    }
 
-  const base = BASE_URLS[provider] || BASE_URLS.other;
-  const model = config?.model || MODELS[provider] || "gpt-4o-mini";
-  const messages: any[] = [];
-  if (systemInstruction) messages.push({ role: "system", content: systemInstruction });
-  messages.push({ role: "user", content: prompt });
+    let defaultBase = "https://api.openai.com/v1";
+    if (provider === "emergent") defaultBase = "https://api.emergent.sh/v1";
+    if (provider === "replit") defaultBase = "https://api.replit.com/ai/v1";
+    if (provider === "other") defaultBase = "https://openrouter.ai/api/v1";
 
-  const res = await fetch(`${base}/chat/completions`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
-    body: JSON.stringify({ model, messages, max_tokens: maxTokens, temperature: 0.3 }),
-  });
-  const data = await res.json();
-  if (data.error) throw new Error(data.error.message || "API error");
-  return data.choices?.[0]?.message?.content || "";
+    const base = customBase || defaultBase;
+    const chosenModel =
+      model ||
+      (provider === "replit"
+        ? "replit-code-v1_5-3b"
+        : provider === "openai"
+        ? "gpt-4o-mini"
+        : "gpt-4o-mini");
+
+    const messages: any[] = [];
+    if (systemInstruction) messages.push({ role: "system", content: systemInstruction });
+    messages.push({ role: "user", content: prompt });
+
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+    };
+
+    const res = await fetch(`${base.replace(/\/+$/, "")}/chat/completions`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({
+        model: chosenModel,
+        messages,
+        max_tokens: maxTokens,
+        temperature: 0.3,
+      }),
+    });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error.message || `API error (${res.status}): ${JSON.stringify(data.error)}`);
+    return data.choices?.[0]?.message?.content || "";
+  }
+
+  throw new Error(`Unsupported AI provider: ${provider}`);
+}
+
+export async function testAIConnection(
+  config: AIProviderConfig
+): Promise<{ success: boolean; message: string; latencyMs: number }> {
+  const startTime = Date.now();
+  try {
+    const res = await callAI(
+      "Ping test. Please reply with 'OK: Connection verified.' in one short sentence.",
+      "You are an automated API connection tester.",
+      config,
+      60
+    );
+    const latency = Date.now() - startTime;
+    return {
+      success: true,
+      message: res.trim() || "Connected successfully.",
+      latencyMs: latency,
+    };
+  } catch (err: any) {
+    const latency = Date.now() - startTime;
+    return {
+      success: false,
+      message: err.message || "Connection failed.",
+      latencyMs: latency,
+    };
+  }
 }
 
 export function parseJSONLoose(text: string): any {
@@ -128,7 +325,6 @@ export function parseJSONLoose(text: string): any {
       try {
         return JSON.parse(cleaned.slice(start));
       } catch {
-        // Try finding last closing bracket
         const lastObj = cleaned.lastIndexOf("}");
         const lastArr = cleaned.lastIndexOf("]");
         const end = Math.max(lastObj, lastArr);

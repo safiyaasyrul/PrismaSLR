@@ -31,7 +31,7 @@ app.get("/api/health", (_req, res) => {
   res.json({ status: "ok", geminiAvailable: hasKey });
 });
 
-// Server-side Gemini generate endpoint
+// Server-side Gemini generate endpoint with automatic model fallback
 app.post("/api/gemini/generate", async (req, res) => {
   try {
     const { prompt, systemInstruction, model = "gemini-3.7-flash", maxOutputTokens = 4000, temperature = 0.3 } = req.body;
@@ -49,13 +49,59 @@ app.post("/api/gemini/generate", async (req, res) => {
       config.systemInstruction = systemInstruction;
     }
 
-    const response = await ai.models.generateContent({
-      model,
-      contents: prompt,
-      config,
-    });
+    // Normalize model name (map deprecated models to modern counterparts)
+    let requestedModel = model;
+    if (
+      !requestedModel ||
+      requestedModel.includes("gemini-2.5") ||
+      requestedModel.includes("gemini-2.0") ||
+      requestedModel.includes("gemini-1.5")
+    ) {
+      requestedModel = "gemini-3.7-flash";
+    }
 
-    res.json({ text: response.text || "" });
+    // Try primary requested model, then fallback sequence
+    const candidateModels = [
+      requestedModel,
+      "gemini-3.7-flash",
+      "gemini-3.1-flash-lite",
+      "gemini-flash-latest",
+      "gemini-3.1-pro-preview",
+    ].filter((m, idx, arr) => m && arr.indexOf(m) === idx);
+
+    let lastError: any = null;
+    let responseText = "";
+
+    for (const currentModel of candidateModels) {
+      try {
+        const response = await ai.models.generateContent({
+          model: currentModel,
+          contents: prompt,
+          config,
+        });
+        if (response.text) {
+          responseText = response.text;
+          lastError = null;
+          break;
+        }
+      } catch (err: any) {
+        lastError = err;
+        console.warn(`Model ${currentModel} failed: ${err.message || err}. Trying next fallback...`);
+      }
+    }
+
+    if (responseText) {
+      return res.json({ text: responseText });
+    }
+
+    if (lastError) {
+      console.error("All Gemini model attempts failed:", lastError);
+      return res.status(500).json({
+        error: lastError.message || "Failed to generate content from Gemini models. You can also configure an alternative AI provider (OpenAI, Claude, Emergent, Replit, or Custom) in the AI Providers & API Keys tab.",
+      });
+    }
+
+    res.json({ text: "" });
   } catch (error: any) {
     console.error("Gemini API error:", error);
     res.status(500).json({ error: error.message || "Failed to generate content from Gemini" });

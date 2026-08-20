@@ -14,19 +14,39 @@ export default function SearchStringsGenerator({
   onUpdateProtocol,
   aiConfig,
 }: SearchStringsGeneratorProps) {
-  const [keywords, setKeywords] = useState<{ term: string; selected: boolean }[]>([
-    { term: "machine learning", selected: true },
-    { term: "deep learning", selected: true },
-    { term: "artificial intelligence", selected: true },
-    { term: "XGBoost", selected: true },
-    { term: "Random Forest", selected: true },
-    { term: "type 2 diabetes", selected: true },
-    { term: "T2DM", selected: true },
-    { term: "diabetes mellitus", selected: true },
-    { term: "early prediction", selected: true },
-    { term: "risk stratification", selected: true },
-    { term: "prognostic model", selected: true },
-  ]);
+  // Generate dynamic keywords based on protocol title and PICO
+  const getInitialKeywords = () => {
+    const terms: string[] = [];
+    if (protocol.title) {
+      const words = protocol.title
+        .replace(/[:,\(\)\-]/g, " ")
+        .split(/\s+/)
+        .filter((w) => w.length > 3 && !["systematic", "literature", "review", "meta", "analysis", "evidence", "synthesis"].includes(w.toLowerCase()));
+      terms.push(...words.slice(0, 4));
+    }
+    if (protocol.objectivesPICO.population) {
+      terms.push(protocol.objectivesPICO.population);
+    }
+    if (protocol.objectivesPICO.intervention) {
+      terms.push(protocol.objectivesPICO.intervention);
+    }
+    if (protocol.objectivesPICO.outcomes) {
+      terms.push(protocol.objectivesPICO.outcomes);
+    }
+
+    const unique = Array.from(new Set(terms.filter((t) => t && t.trim().length > 0)));
+    if (unique.length === 0) {
+      return [
+        { term: "systematic review", selected: true },
+        { term: "empirical evaluation", selected: true },
+        { term: "comparative study", selected: true },
+        { term: "validation benchmark", selected: true },
+      ];
+    }
+    return unique.map((term) => ({ term, selected: true }));
+  };
+
+  const [keywords, setKeywords] = useState<{ term: string; selected: boolean }[]>(getInitialKeywords);
   const [customKeyword, setCustomKeyword] = useState("");
   const [loadingKw, setLoadingKw] = useState(false);
   const [loadingStrings, setLoadingStrings] = useState(false);
@@ -51,13 +71,16 @@ export default function SearchStringsGenerator({
     if (!protocol.title.trim()) return;
     setLoadingKw(true);
     try {
-      const prompt = `Review title: "${protocol.title}"
-PICO population: "${protocol.objectivesPICO.population}"
-PICO intervention: "${protocol.objectivesPICO.intervention}"
+      const prompt = `Systematic Review Title: "${protocol.title}"
+Review Type: "${protocol.reviewType}"
+PICO Population / Context: "${protocol.objectivesPICO.population}"
+PICO Intervention / Exposure: "${protocol.objectivesPICO.intervention}"
+PICO Comparator: "${protocol.objectivesPICO.comparator}"
+PICO Outcomes: "${protocol.objectivesPICO.outcomes}"
 
-Suggest 12-16 academic keywords, synonyms, MeSH terms, and technical phrasing for building Boolean search queries across Scopus, Web of Science, and PubMed for this systematic literature review.
+Suggest 12-16 academic keywords, synonyms, controlled vocabulary terms (MeSH, Emtree, Inspec, or Environmental thesauri), and technical phrasing tailored for building Boolean search queries across Scopus, Web of Science, PubMed, and IEEE Xplore adhering to PRISMA-S Item 7 and PRISMA 2020 Item 7.
 Return ONLY a JSON array of strings: ["term 1", "term 2", ...]. No preamble.`;
-      const text = await callAI(prompt, "You are an expert research medical librarian.", aiConfig);
+      const text = await callAI(prompt, "You are an expert research librarian and PRISMA-S search string engineer.", aiConfig);
       const parsed = parseJSONLoose(text);
       if (Array.isArray(parsed) && parsed.length > 0) {
         setKeywords(parsed.map((t: string) => ({ term: t, selected: true })));

@@ -1,4 +1,4 @@
-import { PrismaChecklistItem } from "../types/slr";
+import { PrismaChecklistItem, PrismaSChecklistItem, RosesChecklistItem } from "../types/slr";
 
 export const INITIAL_PRISMA_CHECKLIST: PrismaChecklistItem[] = [
   // TITLE
@@ -17,11 +17,11 @@ export const INITIAL_PRISMA_CHECKLIST: PrismaChecklistItem[] = [
     section: "ABSTRACT",
     itemNumber: "2",
     topic: "Abstract",
-    checklistDescription: "See the PRISMA 2020 for Abstracts checklist.",
+    checklistDescription: "See the PRISMA 2020 for Abstracts checklist (structured abstract with background, methods, results, and conclusions).",
     appStageMapping: "Stage 09: Synthesis & Review Export",
     status: "Reported",
     locationInReview: "Abstract",
-    userNotes: "Structured summary of background, methods, results, and conclusions.",
+    userNotes: "Structured summary of background, objectives, methods, results, and conclusions.",
   },
   // INTRODUCTION
   {
@@ -32,7 +32,7 @@ export const INITIAL_PRISMA_CHECKLIST: PrismaChecklistItem[] = [
     appStageMapping: "Stage 01: Protocol & PICO",
     status: "Reported",
     locationInReview: "Introduction paragraph 1-2",
-    userNotes: "Context of the clinical/research problem and why an SLR is warranted.",
+    userNotes: "Context of the research problem and why a systematic synthesis is warranted.",
   },
   {
     section: "INTRODUCTION",
@@ -42,9 +42,9 @@ export const INITIAL_PRISMA_CHECKLIST: PrismaChecklistItem[] = [
     appStageMapping: "Stage 01: Protocol & PICO",
     status: "Reported",
     locationInReview: "Introduction / Objectives",
-    userNotes: "Explicit PICO criteria defined in the workbench protocol.",
+    userNotes: "Explicit PICO/PECO criteria defined in the review protocol.",
   },
-  // METHODS (From Image 1)
+  // METHODS (Items 5–15)
   {
     section: "METHODS",
     itemNumber: "5",
@@ -63,7 +63,7 @@ export const INITIAL_PRISMA_CHECKLIST: PrismaChecklistItem[] = [
     appStageMapping: "Stage 02: Search Strategy & Stage 03: Import Records",
     status: "Reported",
     locationInReview: "Methods - Section 2.2",
-    userNotes: "Scopus, Web of Science, PubMed, and Google Scholar sources with timestamps.",
+    userNotes: "Electronic databases, registries, and citation sources with exact search timestamps.",
   },
   {
     section: "METHODS",
@@ -83,7 +83,7 @@ export const INITIAL_PRISMA_CHECKLIST: PrismaChecklistItem[] = [
     appStageMapping: "Stage 04: AI & Dual Screening",
     status: "Reported",
     locationInReview: "Methods - Section 2.4",
-    userNotes: "Dual screening with AI-assisted title/abstract relevance scoring (80% cutoff) and human reviewer verification.",
+    userNotes: "Dual screening with AI-assisted title/abstract relevance scoring and independent human reviewer verification.",
   },
   {
     section: "METHODS",
@@ -93,7 +93,7 @@ export const INITIAL_PRISMA_CHECKLIST: PrismaChecklistItem[] = [
     appStageMapping: "Stage 05: Study Characteristics Matrix",
     status: "Reported",
     locationInReview: "Methods - Section 2.5",
-    userNotes: "Standardized extraction form with LLM-assisted data extraction cross-checked by reviewer.",
+    userNotes: "Standardized extraction form with LLM-assisted data extraction cross-checked by human reviewer.",
   },
   {
     section: "METHODS",
@@ -123,7 +123,7 @@ export const INITIAL_PRISMA_CHECKLIST: PrismaChecklistItem[] = [
     appStageMapping: "Stage 07: Risk of Bias (RoB)",
     status: "Reported",
     locationInReview: "Methods - Section 2.7",
-    userNotes: "5-Domain Risk of Bias tool (Selection, Performance, Attrition, Detection, Reporting) with traffic-light visualization.",
+    userNotes: "Standard Risk of Bias tool (Selection, Performance, Attrition, Detection, Reporting) with traffic-light visualization.",
   },
   {
     section: "METHODS",
@@ -133,7 +133,7 @@ export const INITIAL_PRISMA_CHECKLIST: PrismaChecklistItem[] = [
     appStageMapping: "Stage 01: Protocol & Stage 08: Synthesis & Forest Plot",
     status: "Reported",
     locationInReview: "Methods - Section 2.8",
-    userNotes: "Odds Ratio (OR), Mean Difference (MD), and Accuracy/AUC metrics specified.",
+    userNotes: "Standard effect metrics, statistical discrimination, or comparative outcome measures specified.",
   },
   {
     section: "METHODS",
@@ -183,7 +183,7 @@ export const INITIAL_PRISMA_CHECKLIST: PrismaChecklistItem[] = [
     appStageMapping: "Stage 08: Synthesis & Forest Plot",
     status: "Reported",
     locationInReview: "Methods - Section 2.9.5",
-    userNotes: "Subgroup analysis across clinical settings and algorithm architectures.",
+    userNotes: "Subgroup analysis across study settings, populations, and methodological architectures.",
   },
   {
     section: "METHODS",
@@ -215,7 +215,7 @@ export const INITIAL_PRISMA_CHECKLIST: PrismaChecklistItem[] = [
     locationInReview: "Methods - Section 2.11",
     userNotes: "GRADE framework assessing risk of bias, inconsistency, indirectness, imprecision, and publication bias.",
   },
-  // RESULTS (From Image 2)
+  // RESULTS (Items 16–22)
   {
     section: "RESULTS",
     itemNumber: "16a",
@@ -254,7 +254,7 @@ export const INITIAL_PRISMA_CHECKLIST: PrismaChecklistItem[] = [
     appStageMapping: "Stage 07: Risk of Bias (RoB)",
     status: "Reported",
     locationInReview: "Results - Section 3.3 & Figure 2",
-    userNotes: "Traffic-light RoB matrix detailing judgments across all 5 domains.",
+    userNotes: "Traffic-light RoB matrix detailing judgments across all bias domains.",
   },
   {
     section: "RESULTS",
@@ -294,7 +294,7 @@ export const INITIAL_PRISMA_CHECKLIST: PrismaChecklistItem[] = [
     appStageMapping: "Stage 08: Synthesis & Forest Plot",
     status: "Reported",
     locationInReview: "Results - Section 3.5.3",
-    userNotes: "Exploration of variance across patient subgroups and data collection modalities.",
+    userNotes: "Exploration of variance across subgroups and data collection modalities.",
   },
   {
     section: "RESULTS",
@@ -326,7 +326,7 @@ export const INITIAL_PRISMA_CHECKLIST: PrismaChecklistItem[] = [
     locationInReview: "Results - Section 3.7 & Table 3",
     userNotes: "GRADE Summary of Findings (SoF) table grading certainty as High, Moderate, Low, or Very Low.",
   },
-  // DISCUSSION (From Image 2)
+  // DISCUSSION (Item 23)
   {
     section: "DISCUSSION",
     itemNumber: "23a",
@@ -335,7 +335,7 @@ export const INITIAL_PRISMA_CHECKLIST: PrismaChecklistItem[] = [
     appStageMapping: "Stage 11: Discussion Generator",
     status: "Reported",
     locationInReview: "Discussion - Section 4.1",
-    userNotes: "Synthesis placed into broad clinical and scientific context.",
+    userNotes: "Synthesis placed into broad academic and scientific context.",
   },
   {
     section: "DISCUSSION",
@@ -365,9 +365,9 @@ export const INITIAL_PRISMA_CHECKLIST: PrismaChecklistItem[] = [
     appStageMapping: "Stage 11: Discussion Generator",
     status: "Reported",
     locationInReview: "Discussion - Section 4.4",
-    userNotes: "Actionable recommendations for healthcare practitioners, policymakers, and research directions.",
+    userNotes: "Actionable recommendations for practitioners, policymakers, and research directions.",
   },
-  // OTHER
+  // OTHER INFORMATION (Items 24–27)
   {
     section: "OTHER",
     itemNumber: "24",
@@ -375,8 +375,8 @@ export const INITIAL_PRISMA_CHECKLIST: PrismaChecklistItem[] = [
     checklistDescription: "Provide registration information for the review, including register name and registration number, or state that the review was not registered.",
     appStageMapping: "Stage 01: Protocol & PICO",
     status: "Reported",
-    locationInReview: "Methods - Protocol registration (PROSPERO)",
-    userNotes: "PROSPERO registration ID or protocol declaration recorded.",
+    locationInReview: "Methods - Protocol registration (PROSPERO / Open Science)",
+    userNotes: "Registration ID or protocol declaration recorded.",
   },
   {
     section: "OTHER",
@@ -386,7 +386,7 @@ export const INITIAL_PRISMA_CHECKLIST: PrismaChecklistItem[] = [
     appStageMapping: "Stage 01: Protocol & Stage 12: Checklist Audit",
     status: "Reported",
     locationInReview: "Funding & Acknowledgements",
-    userNotes: "Institutional funding and support disclosures.",
+    userNotes: "Institutional funding and research support disclosures.",
   },
   {
     section: "OTHER",
@@ -410,5 +410,361 @@ export const INITIAL_PRISMA_CHECKLIST: PrismaChecklistItem[] = [
   },
 ];
 
+export const INITIAL_PRISMAS_CHECKLIST: PrismaSChecklistItem[] = [
+  // DOMAIN 1: INFORMATION SOURCES (Items 1-6)
+  {
+    domain: "INFORMATION_SOURCES",
+    itemNumber: "1",
+    topic: "Database names",
+    checklistDescription: "Name each database searched (e.g. Scopus, Web of Science, PubMed, IEEE Xplore, Embase).",
+    appStageMapping: "Stage 02: Search Strategy & Stage 03: Import Records",
+    status: "Reported",
+    locationInReview: "Methods - Section 2.2",
+    userNotes: "Exact database names and platforms documented with provider versions.",
+  },
+  {
+    domain: "INFORMATION_SOURCES",
+    itemNumber: "2",
+    topic: "Multi-database searching",
+    checklistDescription: "If databases were searched simultaneously through a single search platform/interface, name the platform used.",
+    appStageMapping: "Stage 02: Search Strategy",
+    status: "Reported",
+    locationInReview: "Methods - Section 2.2",
+    userNotes: "Documented whether cross-database interfaces or native platform APIs were searched.",
+  },
+  {
+    domain: "INFORMATION_SOURCES",
+    itemNumber: "3",
+    topic: "Study registries",
+    checklistDescription: "Name any study registries searched (e.g. ClinicalTrials.gov, PROSPERO, WHO ICTRP, CEEDER).",
+    appStageMapping: "Stage 01: Protocol & Stage 02: Search Strategy",
+    status: "Reported",
+    locationInReview: "Methods - Section 2.2.1",
+    userNotes: "Trial and protocol registries searched for unpublished or ongoing evidence.",
+  },
+  {
+    domain: "INFORMATION_SOURCES",
+    itemNumber: "4",
+    topic: "Online resources & websites",
+    checklistDescription: "Name any online resources, institutional websites, and search engines searched (e.g. Google Scholar, grey lit repositories, policy archives).",
+    appStageMapping: "Stage 02: Search Strategy",
+    status: "Reported",
+    locationInReview: "Methods - Section 2.2.2",
+    userNotes: "Search engines and organizational grey literature portals recorded.",
+  },
+  {
+    domain: "INFORMATION_SOURCES",
+    itemNumber: "5",
+    topic: "Citation searching",
+    checklistDescription: "Describe any forward, backward, or co-citation searching conducted from included studies or relevant reviews.",
+    appStageMapping: "Stage 02: Search Strategy & Stage 03: Import Records",
+    status: "Reported",
+    locationInReview: "Methods - Section 2.2.3",
+    userNotes: "Backward reference harvesting and forward citation tracking documented.",
+  },
+  {
+    domain: "INFORMATION_SOURCES",
+    itemNumber: "6",
+    topic: "Contacting experts",
+    checklistDescription: "Describe any efforts to contact study authors, subject matter experts, or practitioners to identify unpublished studies or missing datasets.",
+    appStageMapping: "Stage 01: Protocol & Stage 05: Characteristics",
+    status: "Reported",
+    locationInReview: "Methods - Section 2.2.4",
+    userNotes: "Expert consultation and corresponding author inquiries recorded.",
+  },
+  // DOMAIN 2: SEARCH METHODS (Items 7-10)
+  {
+    domain: "SEARCH_METHODS",
+    itemNumber: "7",
+    topic: "Full search strategy",
+    checklistDescription: "Present the full, exact search strategy for each database, register, and search engine searched, copied and pasted exactly as run.",
+    appStageMapping: "Stage 02: Search Strings Generator",
+    status: "Reported",
+    locationInReview: "Methods - Section 2.3 & Appendix 1",
+    userNotes: "Full Boolean query strings with field tags (TITLE-ABS-KEY, TS=, [Title/Abstract]) reproduced verbatim.",
+  },
+  {
+    domain: "SEARCH_METHODS",
+    itemNumber: "8",
+    topic: "Search limits & filters",
+    checklistDescription: "Specify any limits applied to the search (e.g. publication date range, language restrictions, study design filters) and justify their use.",
+    appStageMapping: "Stage 01: Protocol & Stage 02: Search Strategy",
+    status: "Reported",
+    locationInReview: "Methods - Section 2.3.1",
+    userNotes: "Year range and language filters specified with explicit methodological justification.",
+  },
+  {
+    domain: "SEARCH_METHODS",
+    itemNumber: "9",
+    topic: "Controlled vocabulary",
+    checklistDescription: "Specify whether controlled vocabulary terms (e.g. MeSH, Emtree, IEEE terms, Inspec) were exploded, truncated, or adjusted for database syntax.",
+    appStageMapping: "Stage 02: Search Strings Generator",
+    status: "Reported",
+    locationInReview: "Methods - Section 2.3.2",
+    userNotes: "Thesaurus and MeSH headings documented with explosion and wildcard truncation syntax.",
+  },
+  {
+    domain: "SEARCH_METHODS",
+    itemNumber: "10",
+    topic: "Search validation & peer review",
+    checklistDescription: "Describe any peer review or validation of the search strategy (e.g. using the PRESS guideline - Peer Review of Electronic Search Strategies).",
+    appStageMapping: "Stage 02: Search Strings Generator",
+    status: "Reported",
+    locationInReview: "Methods - Section 2.3.3",
+    userNotes: "Search strings validated against known key benchmark papers and peer-reviewed using PRESS checklist.",
+  },
+  // DOMAIN 3: MANAGING RECORDS (Items 13-15)
+  {
+    domain: "MANAGING_RECORDS",
+    itemNumber: "13",
+    topic: "Record management software",
+    checklistDescription: "Name any software or tools used to manage records throughout the search and screening process (e.g. custom SLR workbench, EndNote, Zotero).",
+    appStageMapping: "Stage 03: Import Records & Library",
+    status: "Reported",
+    locationInReview: "Methods - Section 2.4",
+    userNotes: "AI-assisted systematic literature review workbench used for library ingestion and deduplication.",
+  },
+  {
+    domain: "MANAGING_RECORDS",
+    itemNumber: "14",
+    topic: "Deduplication method",
+    checklistDescription: "Describe the deduplication process used, including software, fuzzy matching algorithms, DOI matching, or manual checks.",
+    appStageMapping: "Stage 03: Import Records (Deduplication)",
+    status: "Reported",
+    locationInReview: "Methods - Section 2.4.1",
+    userNotes: "Automated exact and fuzzy title/author deduplication with manual tie-break confirmation.",
+  },
+  {
+    domain: "MANAGING_RECORDS",
+    itemNumber: "15",
+    topic: "Number of records from each source",
+    checklistDescription: "Report the total number of records retrieved from each database, registry, and supplementary source prior to deduplication.",
+    appStageMapping: "Stage 03: Import Records & Stage 10: PRISMA Diagram",
+    status: "Reported",
+    locationInReview: "Results - Section 3.1 & PRISMA Flow Diagram",
+    userNotes: "Itemized source counts tracked and mapped to PRISMA 2020 Identification box.",
+  },
+  // DOMAIN 4: REPRODUCIBILITY (Items 11-12, 16)
+  {
+    domain: "REPRODUCIBILITY",
+    itemNumber: "11",
+    topic: "Search dates",
+    checklistDescription: "State the exact date when each source was searched or last consulted (DD/MM/YYYY).",
+    appStageMapping: "Stage 01: Protocol & Stage 02: Search Strategy",
+    status: "Reported",
+    locationInReview: "Methods - Section 2.2 (Table of Sources)",
+    userNotes: "Exact calendar dates recorded for all database search executions.",
+  },
+  {
+    domain: "REPRODUCIBILITY",
+    itemNumber: "12",
+    topic: "Search updates",
+    checklistDescription: "Describe any search updates conducted prior to final synthesis and publication.",
+    appStageMapping: "Stage 02: Search Strategy",
+    status: "Reported",
+    locationInReview: "Methods - Section 2.2.5",
+    userNotes: "Top-up search policy prior to manuscript submission documented.",
+  },
+  {
+    domain: "REPRODUCIBILITY",
+    itemNumber: "16",
+    topic: "Availability of search documentation",
+    checklistDescription: "State where the full search documentation, Boolean syntax strings, and exported citation files are publicly accessible.",
+    appStageMapping: "Stage 12: Checklist Audit & Review Export",
+    status: "Reported",
+    locationInReview: "Declarations - Data & Code Availability",
+    userNotes: "Complete reproducible search strings and dataset exports provided in supplementary files.",
+  },
+];
+
+export const INITIAL_ROSES_CHECKLIST: RosesChecklistItem[] = [
+  // TITLE
+  {
+    section: "TITLE",
+    itemNumber: "1",
+    topic: "Review type",
+    checklistDescription: "Identify whether the report is a Systematic Review (aimed at answering a specific question with evidence synthesis) or a Systematic Map (aimed at mapping the evidence base and identifying research gaps).",
+    rosesEmphasis: "Review categorization & scope clarity",
+    appStageMapping: "Stage 01: Protocol & PICO",
+    status: "Reported",
+    locationInReview: "Title section / Header",
+    userNotes: "Identified clearly as a Systematic Review / Evidence Synthesis following ROSES standards.",
+  },
+  // ABSTRACT
+  {
+    section: "ABSTRACT",
+    itemNumber: "2",
+    topic: "Structured summary",
+    checklistDescription: "Provide a structured abstract with background context, explicit objective/question, search sources, inclusion criteria, quality appraisal methods, key findings, and environmental/policy implications.",
+    rosesEmphasis: "Policy relevance & environmental context",
+    appStageMapping: "Stage 09: Synthesis & Review Export",
+    status: "Reported",
+    locationInReview: "Abstract",
+    userNotes: "Structured summary highlighting environmental context and policy implications.",
+  },
+  // INTRODUCTION
+  {
+    section: "INTRODUCTION",
+    itemNumber: "3",
+    topic: "Background & environmental context",
+    checklistDescription: "Describe the environmental, ecological, sustainability, or engineering context, problem magnitude, and rationale for synthesizing the evidence.",
+    rosesEmphasis: "Environmental context",
+    appStageMapping: "Stage 01: Protocol & PICO",
+    status: "Reported",
+    locationInReview: "Introduction - Paragraph 1-2",
+    userNotes: "Clear articulation of the environmental challenge, ecosystem impact, and management urgency.",
+  },
+  {
+    section: "INTRODUCTION",
+    itemNumber: "4",
+    topic: "Objectives & stakeholder questions",
+    checklistDescription: "State explicit research objectives and question framing using PECO (Population, Exposure, Comparator, Outcome) or PICO, noting any stakeholder engagement or consultation in question framing.",
+    rosesEmphasis: "Stakeholder implications",
+    appStageMapping: "Stage 01: Protocol & PICO",
+    status: "Reported",
+    locationInReview: "Introduction - Objectives",
+    userNotes: "Explicit PECO/PICO framing with documented stakeholder relevance.",
+  },
+  // METHODS
+  {
+    section: "METHODS",
+    itemNumber: "5",
+    topic: "Search strategy across diverse sources",
+    checklistDescription: "Document comprehensive searches across academic databases, organizational websites, government portals, grey literature, and practitioner reports.",
+    rosesEmphasis: "Diverse grey & academic sources",
+    appStageMapping: "Stage 02: Search Strategy & Stage 03: Import Records",
+    status: "Reported",
+    locationInReview: "Methods - Section 2.2 & 2.3",
+    userNotes: "Academic databases plus environmental reports and organizational repositories searched.",
+  },
+  {
+    section: "METHODS",
+    itemNumber: "6",
+    topic: "Inclusion & exclusion criteria",
+    checklistDescription: "Detail inclusion and exclusion criteria with clear operational definitions for population/ecosystem, intervention/exposure, comparator, outcome, and study design.",
+    rosesEmphasis: "Environmental context",
+    appStageMapping: "Stage 01: Protocol & Stage 04: Screening",
+    status: "Reported",
+    locationInReview: "Methods - Section 2.1",
+    userNotes: "Operationalized environmental eligibility criteria with multi-reviewer screening protocol.",
+  },
+  {
+    section: "METHODS",
+    itemNumber: "7",
+    topic: "Quality appraisal across diverse study designs",
+    checklistDescription: "Describe critical appraisal methods evaluating internal and external validity across heterogeneous study designs (observational, field monitoring, in-situ trials, modeling, lifecycle assessments).",
+    rosesEmphasis: "Quality appraisal across diverse study designs",
+    appStageMapping: "Stage 07: Risk of Bias (RoB)",
+    status: "Reported",
+    locationInReview: "Methods - Section 2.7",
+    userNotes: "Critical appraisal tool evaluating confounding, exposure measurement, selection bias, and ecological validity.",
+  },
+  {
+    section: "METHODS",
+    itemNumber: "8",
+    topic: "Data extraction & coding framework",
+    checklistDescription: "Describe the data extraction and coding framework, metadata recording, and consistency checking among reviewers for evidence mapping.",
+    rosesEmphasis: "Evidence mapping",
+    appStageMapping: "Stage 05: Study Characteristics Matrix",
+    status: "Reported",
+    locationInReview: "Methods - Section 2.5",
+    userNotes: "Standardized extraction matrix capturing environmental variables, geography, and study metrics.",
+  },
+  // RESULTS
+  {
+    section: "RESULTS",
+    itemNumber: "9",
+    topic: "Search outcomes & flow of evidence",
+    checklistDescription: "Report the number of records identified, screened, critically appraised, and included with categorized reasons for exclusion at full-text review.",
+    rosesEmphasis: "Evidence flow",
+    appStageMapping: "Stage 10: PRISMA / ROSES Flow Diagram",
+    status: "Reported",
+    locationInReview: "Results - Section 3.1 & Figure 1",
+    userNotes: "Complete flow of evidence tracked from identification to final synthesis.",
+  },
+  {
+    section: "RESULTS",
+    itemNumber: "10",
+    topic: "Evidence mapping & distribution",
+    checklistDescription: "Present an evidence atlas or systematic map showing the distribution of studies across geographic regions, biomes/ecosystems, intervention types, and outcome categories.",
+    rosesEmphasis: "Evidence mapping",
+    appStageMapping: "Stage 05: Characteristics & Stage 08: Synthesis",
+    status: "Reported",
+    locationInReview: "Results - Section 3.2 & Evidence Map",
+    userNotes: "Thematic and geographic breakdown of the evidence base.",
+  },
+  {
+    section: "RESULTS",
+    itemNumber: "11",
+    topic: "Synthesis of evidence",
+    checklistDescription: "Present narrative, qualitative, or quantitative synthesis with consideration of environmental variability, moderating factors, and ecological heterogeneity.",
+    rosesEmphasis: "Environmental context",
+    appStageMapping: "Stage 08: Synthesis & Forest Plot",
+    status: "Reported",
+    locationInReview: "Results - Section 3.5",
+    userNotes: "Synthesis of findings with subtopic clustering and heterogeneity exploration.",
+  },
+  {
+    section: "RESULTS",
+    itemNumber: "12",
+    topic: "Study validity / critical appraisal findings",
+    checklistDescription: "Summarize critical appraisal results and discuss how study validity and potential biases influence synthesized findings.",
+    rosesEmphasis: "Quality appraisal across diverse study designs",
+    appStageMapping: "Stage 07: Risk of Bias (RoB)",
+    status: "Reported",
+    locationInReview: "Results - Section 3.3",
+    userNotes: "Critical appraisal matrix summarizing study reliability and susceptibility to bias.",
+  },
+  // DISCUSSION
+  {
+    section: "DISCUSSION",
+    itemNumber: "13",
+    topic: "Limitations of the evidence base",
+    checklistDescription: "Discuss limitations in the evidence base (geographic bias, lack of baseline monitoring data, methodological heterogeneity, unpublished industry data).",
+    rosesEmphasis: "Environmental context",
+    appStageMapping: "Stage 11: Discussion Generator",
+    status: "Reported",
+    locationInReview: "Discussion - Section 4.2",
+    userNotes: "Comprehensive critique of evidence gaps and monitoring constraints.",
+  },
+  {
+    section: "DISCUSSION",
+    itemNumber: "14",
+    topic: "Policy & management relevance",
+    checklistDescription: "Provide clear, evidence-grounded implications for environmental managers, policymakers, industry leaders, and conservation practitioners without ungrounded extrapolation.",
+    rosesEmphasis: "Policy relevance",
+    appStageMapping: "Stage 11: Discussion Generator",
+    status: "Reported",
+    locationInReview: "Discussion - Section 4.4",
+    userNotes: "Actionable management implications tailored for policy and field implementation.",
+  },
+  {
+    section: "DISCUSSION",
+    itemNumber: "15",
+    topic: "Stakeholder implications & research gaps",
+    checklistDescription: "Highlight key knowledge gaps, priority research questions for future investigation, and recommendations for standardizing monitoring protocols.",
+    rosesEmphasis: "Stakeholder implications",
+    appStageMapping: "Stage 11: Discussion Generator",
+    status: "Reported",
+    locationInReview: "Discussion - Section 4.4.1",
+    userNotes: "Key research recommendations and stakeholder guidance documented.",
+  },
+  // FUNDING
+  {
+    section: "FUNDING",
+    itemNumber: "16",
+    topic: "Funding & conflicts of interest",
+    checklistDescription: "Declare all sources of funding and potential conflicts of interest, including relationships with advocacy groups, industry funders, or government bodies.",
+    rosesEmphasis: "Transparency & independence",
+    appStageMapping: "Stage 12: Checklist Audit",
+    status: "Reported",
+    locationInReview: "Declarations - Funding & Competing Interests",
+    userNotes: "Full disclosure of funding sources and declaration of author independence.",
+  },
+];
+
 export const initialPrismaChecklist = INITIAL_PRISMA_CHECKLIST;
+export const initialPrismaSChecklist = INITIAL_PRISMAS_CHECKLIST;
+export const initialRosesChecklist = INITIAL_ROSES_CHECKLIST;
+
 

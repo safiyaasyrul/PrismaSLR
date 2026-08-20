@@ -100,6 +100,7 @@ export interface SynthesisResult {
     ciLower: number;
     ciUpper: number;
     heterogeneityI2: string;
+    tau2?: string;
   };
   heterogeneityDiscussion: string;
 }
@@ -137,10 +138,39 @@ export interface PrismaChecklistItem {
   userNotes: string;
 }
 
+export interface PrismaSChecklistItem {
+  domain: "INFORMATION_SOURCES" | "SEARCH_METHODS" | "MANAGING_RECORDS" | "REPRODUCIBILITY";
+  itemNumber: string; // "1" to "16"
+  topic: string;
+  checklistDescription: string;
+  appStageMapping: string;
+  status: "Reported" | "Partially reported" | "Not reported" | "Not applicable";
+  locationInReview: string;
+  userNotes: string;
+}
+
+export interface RosesChecklistItem {
+  section: "TITLE" | "ABSTRACT" | "INTRODUCTION" | "METHODS" | "RESULTS" | "DISCUSSION" | "FUNDING";
+  itemNumber: string;
+  topic: string;
+  checklistDescription: string;
+  rosesEmphasis: string; // e.g. "Environmental context", "Policy relevance", "Stakeholder implications", "Evidence mapping", "Quality appraisal across diverse study designs"
+  appStageMapping: string;
+  status: "Reported" | "Partially reported" | "Not reported" | "Not applicable";
+  locationInReview: string;
+  userNotes: string;
+}
+
 export interface SLRProtocol {
-  // Item 1-4
+  // Items 1, 3 & 4 (Title, Rationale & Objectives)
   title: string;
   reviewType: string;
+  introductionRationale?: string;
+  backgroundContext?: string;
+  knowledgeGap?: string;
+  primaryResearchQuestions?: string[];
+  secondaryObjectives?: string[];
+  protocolRegistration?: string;
   objectivesPICO: {
     population: string;
     intervention: string;

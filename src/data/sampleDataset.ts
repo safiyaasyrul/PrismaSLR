@@ -1,8 +1,100 @@
 import { SLRRecord, ScreeningDecision, StudyCharacteristic, RiskOfBiasItem, SynthesisCategory, GradeCertaintyItem, SynthesisResult, DiscussionSections, SLRProtocol } from "../types/slr";
 
+export const BLANK_PROTOCOL: SLRProtocol = {
+  title: "Untitled Systematic Review",
+  reviewType: "Systematic Review and Meta-Analysis",
+  introductionRationale: "Provide a comprehensive background contextualizing the research problem, the epidemiology or domain significance, existing literature landscape, and the definitive rationale for conducting this systematic evidence synthesis...",
+  backgroundContext: "Domain background, practical or clinical importance, and current standard practices...",
+  knowledgeGap: "Specific inconsistencies, emerging methodologies, or unaddressed questions in existing literature justifying this review...",
+  primaryResearchQuestions: [
+    "RQ1: What is the overall efficacy, predictive performance, or impact of the intervention across eligible studies?",
+    "RQ2: How do comparative approaches or sub-methodologies perform against standard benchmarks?",
+    "RQ3: What sources of methodological heterogeneity or bias influence outcomes across study settings?",
+  ],
+  secondaryObjectives: [
+    "Evaluate subgroup variations across demographic and methodological strata",
+    "Assess certainty of cumulative evidence using the GRADE framework",
+  ],
+  protocolRegistration: "PROSPERO (e.g., CRD42026XXXXXX) / OSF Registries (osf.io/xxxxx)",
+  objectivesPICO: {
+    population: "Define target population or condition (e.g., adults with specific condition)...",
+    intervention: "Define intervention, diagnostic method, or exposure of interest...",
+    comparator: "Define comparator, control group, or standard of care...",
+    outcomes: "Primary and secondary outcomes of interest...",
+    studyDesigns: "Eligible study designs (e.g., RCTs, cohort studies, observational trials)...",
+  },
+  eligibilityCriteria: {
+    inclusion: [
+      "Peer-reviewed original research studies",
+      "Human participants matching target population",
+      "Clear reporting of primary outcomes with quantifiable metrics",
+      "English language publication",
+    ],
+    exclusion: [
+      "Non-peer reviewed preprints, editorials, letters, or commentary",
+      "Studies without full-text access",
+      "Animal or in vitro models",
+    ],
+    timeframe: "Last 5-10 Years - Present",
+    language: "English",
+    groupingForSynthesis: "Thematic grouping by intervention subtype or study design.",
+  },
+  informationSources: [],
+  searchStrategies: [],
+  selectionProcess: {
+    numReviewers: 2,
+    independentScreening: true,
+    disputeResolution: "Consensus through joint re-evaluation or adjudication by a third senior reviewer.",
+    automationTools: "AI-assisted title/abstract screening triage followed by independent human reviewer confirmation.",
+    screeningThreshold: 80,
+  },
+  dataCollectionProcess: {
+    numReviewers: 2,
+    independentExtraction: true,
+    authorContactProcess: "Corresponding authors contacted via email for missing metric values.",
+    automationTools: "Structured automated extraction matrix verified against primary text.",
+  },
+  dataItems: {
+    outcomesSought: "Primary outcomes, effect measures, and secondary clinical or performance metrics.",
+    otherVariables: "Country, sample size, participant demographics, study design, validation method.",
+    missingDataAssumptions: "Missing standard errors imputed according to Cochrane Handbook guidelines.",
+  },
+  riskOfBiasMethods: {
+    toolName: "Cochrane RoB 2 / ROBINS-I / PROBAST across 5 standard bias domains.",
+    numReviewers: 2,
+    domainsAssessed: "Selection Bias, Performance/Predictor Bias, Attrition/Missing Data, Detection Bias, Reporting Bias.",
+    automationTools: "Automated bias heuristics with independent reviewer confirmation.",
+  },
+  effectMeasures: "Odds Ratio (OR), Relative Risk (RR), Hazard Ratio (HR), Mean Difference (MD), or AUC-ROC with 95% CIs.",
+  synthesisMethods: {
+    criteriaForEligibility: "Studies providing validated quantitative outcome metrics.",
+    dataPreparation: "Standardization of effect sizes and variance calculations.",
+    visualDisplays: "Forest plots, Risk of Bias traffic-light plots, and GRADE Summary of Findings tables.",
+    synthesisModel: "DerSimonian-Laird random-effects meta-analysis model with inverse-variance weighting.",
+    heterogeneityExploration: "Subgroup analysis and meta-regression across study characteristics.",
+    sensitivityAnalysis: "Leave-one-out sensitivity analysis to assess outlier influence.",
+  },
+  reportingBiasMethods: "Visual inspection of funnel plot asymmetry and Egger's linear regression test.",
+  certaintyMethods: "GRADE (Grading of Recommendations Assessment, Development and Evaluation) framework.",
+};
+
 export const SAMPLE_PROTOCOL: SLRProtocol = {
   title: "Machine Learning Approaches for Early Type 2 Diabetes Prediction: A Systematic Review and Meta-Analysis",
   reviewType: "Systematic Review and Quantitative Meta-Analysis",
+  introductionRationale: "Type 2 Diabetes Mellitus (T2DM) represents a escalating global health crisis affecting over 530 million adults worldwide, associated with substantial macrovascular and microvascular morbidity. Early detection during asymptomatic dysglycemic or prediabetic stages permits timely lifestyle interventions and pharmacotherapy that significantly delay or prevent disease progression. Although conventional risk scores (such as FINDRISC and the ADA Risk Tool) provide accessible baseline screening, their discriminative performance is constrained when processing complex, non-linear interactions across high-dimensional clinical registers, metabolic panels, and longitudinal EHR trajectories. Recent advances in supervised machine learning—including tree-based ensembles (XGBoost, LightGBM, Random Forest) and deep neural architectures—demonstrate superior capacity to capture complex temporal risk profiles. However, published studies vary widely in model architectures, validation protocols, cohort demographics, and risk-of-bias controls. A rigorous, PRISMA 2020-compliant systematic review and quantitative meta-analysis is urgently warranted to consolidate pooled diagnostic discrimination (AUC-ROC), compare model families against conventional risk scores, appraise methodological risk of bias via PROBAST, and evaluate the overall certainty of cumulative evidence using the GRADE framework.",
+  backgroundContext: "T2DM accounts for >90% of global diabetes cases, imposing an estimated $966 billion annual economic burden. Routine clinical risk calculators frequently suffer from moderate discrimination (AUC ~0.70-0.76) and suboptimal calibration when deployed across multi-ethnic cohorts. Machine learning models leveraging multimodal electronic health record features offer a promising paradigm for personalized predictive stratification.",
+  knowledgeGap: "Existing literature is fragmented across disparate algorithm implementations, heterogeneous feature sets, and inconsistent reporting of calibration and external validation. No recent systematic meta-analysis has quantitatively synthesized pooled discrimination across distinct machine learning families while systematically grading certainty under PRISMA 2020 and GRADE standards.",
+  primaryResearchQuestions: [
+    "RQ1 (Discrimination): What is the pooled diagnostic and predictive discrimination (AUC-ROC / C-index) of supervised machine learning algorithms in predicting incident Type 2 Diabetes?",
+    "RQ2 (Comparative Superiority): Do tree-based gradient boosted ensembles (XGBoost/LightGBM) demonstrate statistically superior predictive accuracy compared to traditional multivariable logistic regression and clinical risk scores?",
+    "RQ3 (Methodological Bias & Generalizability): What specific methodological risk of bias domains (selection, predictor definition, outcome determination, overfitting) most critically affect model transportability and external validation?",
+  ],
+  secondaryObjectives: [
+    "Quantify between-study heterogeneity (I²) across cohort sample sizes and validation methods (cross-validation vs. external cohorts)",
+    "Identify top consistent predictive feature rankings (e.g., fasting plasma glucose, HbA1c, BMI, lipid ratios) across model architectures",
+    "Formulate evidence-based clinical implementation guidelines based on GRADE certainty ratings",
+  ],
+  protocolRegistration: "PROSPERO 2026 Registration ID: CRD42026884129 (Available via osf.io/preprints/t2dm-ml-slr)",
   objectivesPICO: {
     population: "Adult populations (aged >= 18 years) at risk of developing Type 2 Diabetes Mellitus (T2DM) without baseline diagnosis.",
     intervention: "Supervised machine learning algorithms (e.g., XGBoost, Random Forest, Support Vector Machines, Neural Networks, Logistic Regression) utilizing electronic health records, genomic markers, or metabolic biomarkers.",
